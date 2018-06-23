@@ -13,7 +13,8 @@ class App extends Component {
     clicked: [],
     cardOptions,
     counter: 0,
-    highScore: 0
+    highScore: 0,
+    helpMessage: ""
   };
 
   removeFriend = id => {
@@ -29,44 +30,67 @@ class App extends Component {
         let newCount = this.state.counter + 1;
         let selected = this.state.cardOptions.filter(cardOption => cardOption.id === cardID)
         let newClicked = selected[0];
-        let newArray = [];
+        let newArray = this.state.clicked;
+        let cardOptions = this.state.cardOptions.sort(function(a, b){return 0.5 - Math.random()});
         newArray.push(newClicked);
-        console.log(newArray)
         this.setState({
             clicked: newArray,
-            highScore: newCount,
-            counter: newCount
+            counter: newCount,
+            helpMessage: "Great keep going!",
+            cardOptions: cardOptions
         })
 
     }
 
     else {
-        for (var i = 0; i < this.state.cardOptions.length; i++) {
-            if (this.state.clicked[i].id === cardID) {
-                console.log("Sorry you picked that one already")
+        let alreadyClicked = false
+        for (var i = 0; i < this.state.clicked.length; i++) {
+            if (this.state.clicked[i]['id'] === cardID) {
+                alreadyClicked = true
+
                 // return array[i];
             }
-            else {
-                let newCount = this.state.counter + 1;
-                let selected = this.state.cardOptions.filter(cardOption => cardOption.id === cardID)
-                let newClicked = selected[0];
-                let newArray = [];
-                newArray.push(newClicked);
-                if (newCount > this.state.highScore) {
-                    this.setState({
-                        clicked: newArray,
-                        highScore: newCount,
-                        counter: newCount
-                    })
-                }
+            else if (this.state.clicked[i]['id'] !== cardID) {
+                continue
     
-                else if (newCount <= this.state.highScore) {
-                    this.setState({
-                        clicked: newArray,
-                        counter: newCount
-                    })
-                }
-    
+            }
+        }
+        if (alreadyClicked === true) {
+            console.log("Sorry you picked that one already")
+            let cardOptions = this.state.cardOptions.sort(function(a, b){return 0.5 - Math.random()});
+            this.setState({
+                clicked: [],
+                counter: 0,
+                helpMessage: "Sorry you picked that one already! Score reset!",
+                cardOptions: cardOptions
+            })
+        }
+
+        else if (alreadyClicked === false) {
+            let newCount = this.state.counter + 1;
+            let selected = this.state.cardOptions.filter(cardOption => cardOption.id === cardID)
+            let newClicked = selected[0];
+            let newArray = this.state.clicked;
+            let cardOptions = this.state.cardOptions.sort(function(a, b){return 0.5 - Math.random()});
+            console.log(newArray);
+            newArray.push(newClicked);
+            if (newCount > this.state.highScore) {
+                this.setState({
+                    clicked: newArray,
+                    highScore: newCount,
+                    counter: newCount,
+                    helpMessage: "Great keep going!",
+                    cardOptions: cardOptions
+                })
+            }
+
+            else if (newCount <= this.state.highScore) {
+                this.setState({
+                    clicked: newArray,
+                    counter: newCount,
+                    helpMessage: "Great keep going!",
+                    cardOptions: cardOptions
+                })
             }
         }
     }
@@ -89,6 +113,7 @@ class App extends Component {
                     <div className="jumbotron">
                         <h1>Yu-Gi-Oh!</h1>
                         <p>Click the different Yu-Gi-Oh cards but don't click the same one twice! Keep playing to reach the top score</p>
+                        <h3>Turn {this.state.counter}: {this.state.helpMessage}</h3>
                     </div>
                 </div>
             </div>
